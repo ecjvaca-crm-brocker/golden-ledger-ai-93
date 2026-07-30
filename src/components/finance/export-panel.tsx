@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { FileDown, FileSpreadsheet, Loader2, Sheet } from "lucide-react";
+import { FileDown, FileSpreadsheet, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,13 +20,7 @@ import {
   type AccountType,
   type Entry,
 } from "@/lib/finance";
-import {
-  exportCsv,
-  exportPdf,
-  exportXlsx,
-  filterEntries,
-  type ReportFilters,
-} from "@/lib/export-report";
+import { exportCsv, exportPdf, filterEntries, type ReportFilters } from "@/lib/export-report";
 
 const TYPES: AccountType[] = ["activo", "pasivo", "patrimonio", "ingreso", "gasto"];
 
@@ -53,19 +47,14 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
     );
   };
 
-  const handle = async (kind: "csv" | "pdf" | "xlsx") => {
+  const handle = async (kind: "csv" | "pdf") => {
     if (!preview.length) {
       toast.error("No hay movimientos en el rango seleccionado");
       return;
     }
     try {
       setLoading(true);
-      const n =
-        kind === "csv"
-          ? exportCsv(entries, filters)
-          : kind === "pdf"
-            ? await exportPdf(entries, filters)
-            : await exportXlsx(entries, filters);
+      const n = kind === "csv" ? exportCsv(entries, filters) : await exportPdf(entries, filters);
       toast.success(`Reporte ${kind.toUpperCase()} generado con ${n} movimientos`);
     } catch {
       toast.error("No se pudo generar el reporte");
@@ -129,10 +118,6 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
           <Button variant="outline" onClick={() => handle("csv")} disabled={loading}>
             <FileSpreadsheet className="mr-1.5 size-4" />
             Exportar CSV
-          </Button>
-          <Button variant="outline" onClick={() => handle("xlsx")} disabled={loading}>
-            <Sheet className="mr-1.5 size-4" />
-            Exportar XLSX
           </Button>
         </div>
       </div>
