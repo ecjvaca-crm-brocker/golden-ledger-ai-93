@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import {
   Activity,
   Briefcase,
+  FileDown,
   Landmark,
   PiggyBank,
   Scale,
@@ -16,6 +17,7 @@ import { EntryForm } from "@/components/finance/entry-form";
 import { EntriesTable } from "@/components/finance/entries-table";
 import { AccountsTable } from "@/components/finance/accounts-table";
 import { HealthPanel, RecommendationList } from "@/components/finance/health-panel";
+import { ExportPanel } from "@/components/finance/export-panel";
 import {
   CashflowChart,
   ExpenseByCategoryChart,
@@ -131,6 +133,9 @@ function Index() {
             <TabsTrigger value="salud">
               <Briefcase className="mr-1.5 size-4" /> Salud financiera
             </TabsTrigger>
+            <TabsTrigger value="reportes">
+              <FileDown className="mr-1.5 size-4" /> Reportes
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="mt-6 space-y-6">
@@ -164,6 +169,10 @@ function Index() {
               <HealthPanel metrics={business} title="Indicadores — Negocio" />
             </div>
             <RecommendationList items={recs} />
+          </TabsContent>
+
+          <TabsContent value="reportes" className="mt-6">
+            <ExportPanel entries={entries} />
           </TabsContent>
         </Tabs>
       </main>
