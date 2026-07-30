@@ -1,6 +1,7 @@
 import {
   ACCOUNT_TYPE_LABEL,
   accountByCode,
+  CHART_OF_ACCOUNTS,
   formatMoney,
   computeMetrics,
   buildIndicators,
