@@ -35,11 +35,11 @@ export const Route = createFileRoute("/")({
         content:
           "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial.",
       },
-      { property: "og:title", content: "Tracker Financiero Personal y de Negocio" },
+      { property: "og:title", content: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
       {
         property: "og:description",
         content:
-          "Dashboard consolidado con plan de cuentas NIIF, indicadores económicos y recomendaciones de presupuesto.",
+          "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial.",
       },
     ],
   }),

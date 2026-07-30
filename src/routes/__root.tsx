@@ -78,20 +78,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Tracker Financiero | Personal y Negocio" },
+      { title: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
       {
         name: "description",
         content:
-          "Control de ingresos, gastos, plan de cuentas NIIF, indicadores y recomendaciones financieras.",
+          "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial.",
       },
-      { property: "og:title", content: "Tracker Financiero | Personal y Negocio" },
+      { property: "og:title", content: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
       {
         property: "og:description",
-        content: "Dashboard financiero con indicadores y recomendaciones de presupuesto.",
+        content: "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
+      { name: "twitter:description", content: "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ae20f52-7fab-4432-a78d-ec5ef70ef1aa/id-preview-265d972d--763246c3-99e8-40ab-8516-d250d6b360a0.lovable.app-1785418788882.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5ae20f52-7fab-4432-a78d-ec5ef70ef1aa/id-preview-265d972d--763246c3-99e8-40ab-8516-d250d6b360a0.lovable.app-1785418788882.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -104,7 +108,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
