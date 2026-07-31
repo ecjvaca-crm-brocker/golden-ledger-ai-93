@@ -7,6 +7,8 @@ import {
   Landmark,
   PiggyBank,
   Scale,
+  Sparkles,
+  Target,
   TrendingDown,
   TrendingUp,
   Wallet,
@@ -18,12 +20,16 @@ import { EntriesTable } from "@/components/finance/entries-table";
 import { AccountsTable } from "@/components/finance/accounts-table";
 import { HealthPanel, RecommendationList } from "@/components/finance/health-panel";
 import { ExportPanel } from "@/components/finance/export-panel";
+import { BudgetPanel } from "@/components/finance/budget-panel";
+import { BankingPanel } from "@/components/finance/banking-panel";
 import {
   CashflowChart,
   ExpenseByCategoryChart,
   ScopeComparisonChart,
 } from "@/components/finance/charts";
 import { useLedger } from "@/lib/use-ledger";
+import { useBudgets } from "@/lib/budget";
+import { useBankProducts } from "@/lib/banking";
 import { buildRecommendations, computeMetrics, formatMoney } from "@/lib/finance";
 
 export const Route = createFileRoute("/")({
@@ -48,6 +54,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { entries, addEntry, removeEntry } = useLedger();
+  const { budgets, addBudget, removeBudget } = useBudgets();
+  const { products, addProduct, removeProduct } = useBankProducts();
 
   const personalEntries = useMemo(
     () => entries.filter((e) => e.scope === "personal"),
@@ -130,6 +138,12 @@ function Index() {
             <TabsTrigger value="cuentas">
               <Landmark className="mr-1.5 size-4" /> Plan de cuentas
             </TabsTrigger>
+            <TabsTrigger value="presupuesto">
+              <Target className="mr-1.5 size-4" /> Presupuesto
+            </TabsTrigger>
+            <TabsTrigger value="banca">
+              <Sparkles className="mr-1.5 size-4" /> Banca &amp; IA
+            </TabsTrigger>
             <TabsTrigger value="salud">
               <Briefcase className="mr-1.5 size-4" /> Salud financiera
             </TabsTrigger>
@@ -161,6 +175,25 @@ function Index() {
 
           <TabsContent value="cuentas" className="mt-6">
             <AccountsTable entries={entries} />
+          </TabsContent>
+
+          <TabsContent value="presupuesto" className="mt-6">
+            <BudgetPanel
+              budgets={budgets}
+              entries={entries}
+              onAdd={addBudget}
+              onRemove={removeBudget}
+            />
+          </TabsContent>
+
+          <TabsContent value="banca" className="mt-6">
+            <BankingPanel
+              products={products}
+              entries={entries}
+              metrics={personal}
+              onAdd={addProduct}
+              onRemove={removeProduct}
+            />
           </TabsContent>
 
           <TabsContent value="salud" className="mt-6 space-y-6">
