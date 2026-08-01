@@ -7,6 +7,7 @@ import {
   Landmark,
   PiggyBank,
   Scale,
+  Sprout,
   Sparkles,
   Target,
   TrendingDown,
@@ -22,6 +23,7 @@ import { HealthPanel, RecommendationList } from "@/components/finance/health-pan
 import { ExportPanel } from "@/components/finance/export-panel";
 import { BudgetPanel } from "@/components/finance/budget-panel";
 import { BankingPanel } from "@/components/finance/banking-panel";
+import { SavingsPanel } from "@/components/finance/savings-panel";
 import {
   CashflowChart,
   ExpenseByCategoryChart,
@@ -30,6 +32,7 @@ import {
 import { useLedger } from "@/lib/use-ledger";
 import { useBudgets } from "@/lib/budget";
 import { useBankProducts } from "@/lib/banking";
+import { useSavingsGoals } from "@/lib/savings";
 import { buildRecommendations, computeMetrics, formatMoney } from "@/lib/finance";
 
 export const Route = createFileRoute("/")({
@@ -56,6 +59,7 @@ function Index() {
   const { entries, addEntry, removeEntry } = useLedger();
   const { budgets, addBudget, removeBudget } = useBudgets();
   const { products, addProduct, removeProduct } = useBankProducts();
+  const { goals, addGoal, removeGoal } = useSavingsGoals();
 
   const personalEntries = useMemo(
     () => entries.filter((e) => e.scope === "personal"),
@@ -141,6 +145,9 @@ function Index() {
             <TabsTrigger value="presupuesto">
               <Target className="mr-1.5 size-4" /> Presupuesto
             </TabsTrigger>
+            <TabsTrigger value="ahorro">
+              <Sprout className="mr-1.5 size-4" /> Metas de ahorro
+            </TabsTrigger>
             <TabsTrigger value="banca">
               <Sparkles className="mr-1.5 size-4" /> Banca &amp; IA
             </TabsTrigger>
@@ -196,6 +203,15 @@ function Index() {
             />
           </TabsContent>
 
+          <TabsContent value="ahorro" className="mt-6">
+            <SavingsPanel
+              goals={goals}
+              entries={entries}
+              onAdd={addGoal}
+              onRemove={removeGoal}
+            />
+          </TabsContent>
+
           <TabsContent value="salud" className="mt-6 space-y-6">
             <div className="grid gap-6 lg:grid-cols-2">
               <HealthPanel metrics={personal} title="Indicadores — Finanzas personales" />
@@ -210,8 +226,16 @@ function Index() {
         </Tabs>
       </main>
 
-      <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        Los indicadores son orientativos y no sustituyen asesoría contable o tributaria formal.
+      <footer className="border-t py-8">
+        <div className="mx-auto max-w-3xl space-y-2 px-5 text-center text-xs text-muted-foreground">
+          <p>
+            Las proyecciones son cálculos informativos basados en datos del usuario y no
+            constituyen asesoría financiera vinculante.
+          </p>
+          <p>
+            Los indicadores son orientativos y no sustituyen asesoría contable o tributaria formal.
+          </p>
+        </div>
       </footer>
     </div>
   );
