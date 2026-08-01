@@ -24,6 +24,7 @@ import { ExportPanel } from "@/components/finance/export-panel";
 import { BudgetPanel } from "@/components/finance/budget-panel";
 import { BankingPanel } from "@/components/finance/banking-panel";
 import { SavingsPanel } from "@/components/finance/savings-panel";
+import { SessionNav } from "@/components/finance/session-nav";
 import {
   CashflowChart,
   ExpenseByCategoryChart,
