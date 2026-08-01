@@ -194,13 +194,21 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="banca" className="mt-6">
-            <SavingsPanelSlot />
             <BankingPanel
               products={products}
               entries={entries}
               metrics={personal}
               onAdd={addProduct}
               onRemove={removeProduct}
+            />
+          </TabsContent>
+
+          <TabsContent value="ahorro" className="mt-6">
+            <SavingsPanel
+              goals={goals}
+              entries={entries}
+              onAdd={addGoal}
+              onRemove={removeGoal}
             />
           </TabsContent>
 
@@ -218,8 +226,16 @@ function Index() {
         </Tabs>
       </main>
 
-      <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        Los indicadores son orientativos y no sustituyen asesoría contable o tributaria formal.
+      <footer className="border-t py-8">
+        <div className="mx-auto max-w-3xl space-y-2 px-5 text-center text-xs text-muted-foreground">
+          <p>
+            Las proyecciones son cálculos informativos basados en datos del usuario y no
+            constituyen asesoría financiera vinculante.
+          </p>
+          <p>
+            Los indicadores son orientativos y no sustituyen asesoría contable o tributaria formal.
+          </p>
+        </div>
       </footer>
     </div>
   );
