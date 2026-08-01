@@ -7,6 +7,7 @@ import {
   Landmark,
   PiggyBank,
   Scale,
+  Sprout,
   Sparkles,
   Target,
   TrendingDown,
@@ -22,6 +23,7 @@ import { HealthPanel, RecommendationList } from "@/components/finance/health-pan
 import { ExportPanel } from "@/components/finance/export-panel";
 import { BudgetPanel } from "@/components/finance/budget-panel";
 import { BankingPanel } from "@/components/finance/banking-panel";
+import { SavingsPanel } from "@/components/finance/savings-panel";
 import {
   CashflowChart,
   ExpenseByCategoryChart,
@@ -30,6 +32,7 @@ import {
 import { useLedger } from "@/lib/use-ledger";
 import { useBudgets } from "@/lib/budget";
 import { useBankProducts } from "@/lib/banking";
+import { useSavingsGoals } from "@/lib/savings";
 import { buildRecommendations, computeMetrics, formatMoney } from "@/lib/finance";
 
 export const Route = createFileRoute("/")({
@@ -56,6 +59,7 @@ function Index() {
   const { entries, addEntry, removeEntry } = useLedger();
   const { budgets, addBudget, removeBudget } = useBudgets();
   const { products, addProduct, removeProduct } = useBankProducts();
+  const { goals, addGoal, removeGoal } = useSavingsGoals();
 
   const personalEntries = useMemo(
     () => entries.filter((e) => e.scope === "personal"),
@@ -141,6 +145,9 @@ function Index() {
             <TabsTrigger value="presupuesto">
               <Target className="mr-1.5 size-4" /> Presupuesto
             </TabsTrigger>
+            <TabsTrigger value="ahorro">
+              <Sprout className="mr-1.5 size-4" /> Metas de ahorro
+            </TabsTrigger>
             <TabsTrigger value="banca">
               <Sparkles className="mr-1.5 size-4" /> Banca &amp; IA
             </TabsTrigger>
@@ -187,6 +194,7 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="banca" className="mt-6">
+            <SavingsPanelSlot />
             <BankingPanel
               products={products}
               entries={entries}
