@@ -22,14 +22,10 @@ export interface BankProduct {
 
 const KEY = "finanzas-productos-v1";
 
-const SEED: BankProduct[] = [
-  { id: "p1", entity: "Bancolombia", type: "ahorro", alias: "Ahorro principal", balance: 9800, rate: 4 },
-  { id: "p2", entity: "Davivienda", type: "tarjeta", alias: "Visa Signature", balance: 3100, limit: 8000, rate: 28 },
-  { id: "p3", entity: "Fiduciaria Global", type: "inversion", alias: "Póliza a 12 meses", balance: 6500, rate: 9.5 },
-];
+
 
 export function useBankProducts() {
-  const [products, setProducts] = useState<BankProduct[]>(SEED);
+  const [products, setProducts] = useState<BankProduct[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

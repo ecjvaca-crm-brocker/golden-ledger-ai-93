@@ -72,14 +72,10 @@ export function goalTotals(rows: GoalProjection[]) {
 
 const KEY = "finanzas-metas-ahorro-v1";
 
-const SEED: SavingsGoal[] = [
-  { id: "g1", name: "Fondo de emergencia", scope: "personal", target: 12000, saved: 4200, deadline: "2027-06-30" },
-  { id: "g2", name: "Cuota inicial vivienda", scope: "personal", target: 30000, saved: 6500, deadline: "2028-12-31" },
-  { id: "g3", name: "Reserva de capital de trabajo", scope: "negocio", target: 20000, saved: 8000, deadline: "2027-03-31" },
-];
+
 
 export function useSavingsGoals() {
-  const [goals, setGoals] = useState<SavingsGoal[]>(SEED);
+  const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

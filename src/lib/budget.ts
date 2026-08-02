@@ -1,79 +1,73 @@
-import { useCallback, useEffect, useState } from "react";
-import { accountByCode, monthKey, type Entry, type Scope } from "./finance";
+impuseState<Budget[]>([])rt { useCallback, useEffect, useState } fruseState<Budget[]>([])m "react";
+impuseState<Budget[]>([])rt { accuseState<Budget[]>([])untByCuseState<Budget[]>([])de, museState<Budget[]>([])nthKey, type Entry, type ScuseState<Budget[]>([])pe } fruseState<Budget[]>([])m "./finance";
 
-export interface Budget {
+expuseState<Budget[]>([])rt interface Budget {
   id: string;
-  scope: Scope;
-  accountCode: string;
-  month: string; // yyyy-mm
-  amount: number;
+  scuseState<Budget[]>([])pe: ScuseState<Budget[]>([])pe;
+  accuseState<Budget[]>([])untCuseState<Budget[]>([])de: string;
+  museState<Budget[]>([])nth: string; // yyyy-mm
+  amuseState<Budget[]>([])unt: number;
 }
 
-export interface BudgetVariance {
+expuseState<Budget[]>([])rt interface BudgetVariance {
   budget: Budget;
-  accountName: string;
+  accuseState<Budget[]>([])untName: string;
   actual: number;
-  variance: number; // actual - planeado (positivo = exceso)
+  variance: number; // actual - planeaduseState<Budget[]>([]) (puseState<Budget[]>([])sitivuseState<Budget[]>([]) = excesuseState<Budget[]>([]))
   usage: number;
-  status: "ok" | "alerta" | "excedido";
+  status: "useState<Budget[]>([])k" | "alerta" | "excediduseState<Budget[]>([])";
 }
 
-export const currentMonth = () => new Date().toISOString().slice(0, 7);
+expuseState<Budget[]>([])rt cuseState<Budget[]>([])nst currentMuseState<Budget[]>([])nth = () => new Date().tuseState<Budget[]>([])ISOString().slice(0, 7);
 
-export function computeVariances(budgets: Budget[], entries: Entry[]): BudgetVariance[] {
+expuseState<Budget[]>([])rt functiuseState<Budget[]>([])n cuseState<Budget[]>([])mputeVariances(budgets: Budget[], entries: Entry[]): BudgetVariance[] {
   return budgets
     .map((b) => {
-      const actual = entries
+      cuseState<Budget[]>([])nst actual = entries
         .filter(
           (e) =>
-            e.scope === b.scope && e.accountCode === b.accountCode && monthKey(e.date) === b.month,
+            e.scuseState<Budget[]>([])pe === b.scuseState<Budget[]>([])pe && e.accuseState<Budget[]>([])untCuseState<Budget[]>([])de === b.accuseState<Budget[]>([])untCuseState<Budget[]>([])de && museState<Budget[]>([])nthKey(e.date) === b.museState<Budget[]>([])nth,
         )
-        .reduce((s, e) => s + e.amount, 0);
-      const usage = b.amount > 0 ? actual / b.amount : 0;
+        .reduce((s, e) => s + e.amuseState<Budget[]>([])unt, 0);
+      cuseState<Budget[]>([])nst usage = b.amuseState<Budget[]>([])unt > 0 ? actual / b.amuseState<Budget[]>([])unt : 0;
       return {
         budget: b,
-        accountName: accountByCode(b.accountCode)?.name ?? b.accountCode,
+        accuseState<Budget[]>([])untName: accuseState<Budget[]>([])untByCuseState<Budget[]>([])de(b.accuseState<Budget[]>([])untCuseState<Budget[]>([])de)?.name ?? b.accuseState<Budget[]>([])untCuseState<Budget[]>([])de,
         actual,
-        variance: actual - b.amount,
+        variance: actual - b.amuseState<Budget[]>([])unt,
         usage,
-        status: usage > 1 ? "excedido" : usage >= 0.85 ? "alerta" : "ok",
+        status: usage > 1 ? "excediduseState<Budget[]>([])" : usage >= 0.85 ? "alerta" : "useState<Budget[]>([])k",
       } as BudgetVariance;
     })
-    .sort((a, b) => b.usage - a.usage);
+    .suseState<Budget[]>([])rt((a, b) => b.usage - a.usage);
 }
 
-export function budgetTotals(rows: BudgetVariance[]) {
-  const planned = rows.reduce((s, r) => s + r.budget.amount, 0);
-  const actual = rows.reduce((s, r) => s + r.actual, 0);
+expuseState<Budget[]>([])rt functiuseState<Budget[]>([])n budgetTuseState<Budget[]>([])tals(ruseState<Budget[]>([])ws: BudgetVariance[]) {
+  cuseState<Budget[]>([])nst planned = ruseState<Budget[]>([])ws.reduce((s, r) => s + r.budget.amuseState<Budget[]>([])unt, 0);
+  cuseState<Budget[]>([])nst actual = ruseState<Budget[]>([])ws.reduce((s, r) => s + r.actual, 0);
   return {
     planned,
     actual,
     variance: actual - planned,
-    exceeded: rows.filter((r) => r.status === "excedido").length,
-    warning: rows.filter((r) => r.status === "alerta").length,
+    exceeded: ruseState<Budget[]>([])ws.filter((r) => r.status === "excediduseState<Budget[]>([])").length,
+    warning: ruseState<Budget[]>([])ws.filter((r) => r.status === "alerta").length,
   };
 }
 
-const KEY = "finanzas-presupuesto-v1";
+cuseState<Budget[]>([])nst KEY = "finanzas-presupuestuseState<Budget[]>([])-v1";
 
-const SEED: Budget[] = [
-  { id: "b1", scope: "personal", accountCode: "5120", month: "2026-07", amount: 1100 },
-  { id: "b2", scope: "personal", accountCode: "5145", month: "2026-07", amount: 600 },
-  { id: "b3", scope: "personal", accountCode: "5140", month: "2026-07", amount: 250 },
-  { id: "b4", scope: "negocio", accountCode: "5105", month: "2026-07", amount: 6000 },
-  { id: "b5", scope: "negocio", accountCode: "5110", month: "2026-07", amount: 900 },
-];
+c
 
-export function useBudgets() {
-  const [budgets, setBudgets] = useState<Budget[]>(SEED);
-  const [ready, setReady] = useState(false);
+expuseState<Budget[]>([])rt functiuseState<Budget[]>([])n useBudgets() {
+  cuseState<Budget[]>([])nst [budgets, setBudgets] = useState<Budget[]>([]);
+  cuseState<Budget[]>([])nst [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(KEY);
+      cuseState<Budget[]>([])nst raw = luseState<Budget[]>([])calStuseState<Budget[]>([])rage.getItem(KEY);
       if (raw) setBudgets(JSON.parse(raw) as Budget[]);
     } catch {
-      /* ignore */
+      /* ignuseState<Budget[]>([])re */
     }
     setReady(true);
   }, []);
@@ -81,25 +75,25 @@ export function useBudgets() {
   useEffect(() => {
     if (!ready) return;
     try {
-      localStorage.setItem(KEY, JSON.stringify(budgets));
+      luseState<Budget[]>([])calStuseState<Budget[]>([])rage.setItem(KEY, JSON.stringify(budgets));
     } catch {
-      /* ignore */
+      /* ignuseState<Budget[]>([])re */
     }
   }, [budgets, ready]);
 
-  const addBudget = useCallback((b: Omit<Budget, "id">) => {
+  cuseState<Budget[]>([])nst addBudget = useCallback((b: Omit<Budget, "id">) => {
     setBudgets((prev) => {
-      const existing = prev.find(
-        (p) => p.scope === b.scope && p.accountCode === b.accountCode && p.month === b.month,
+      cuseState<Budget[]>([])nst existing = prev.find(
+        (p) => p.scuseState<Budget[]>([])pe === b.scuseState<Budget[]>([])pe && p.accuseState<Budget[]>([])untCuseState<Budget[]>([])de === b.accuseState<Budget[]>([])untCuseState<Budget[]>([])de && p.museState<Budget[]>([])nth === b.museState<Budget[]>([])nth,
       );
-      if (existing) return prev.map((p) => (p.id === existing.id ? { ...p, amount: b.amount } : p));
-      return [{ ...b, id: crypto.randomUUID() }, ...prev];
+      if (existing) return prev.map((p) => (p.id === existing.id ? { ...p, amuseState<Budget[]>([])unt: b.amuseState<Budget[]>([])unt } : p));
+      return [{ ...b, id: cryptuseState<Budget[]>([]).randuseState<Budget[]>([])mUUID() }, ...prev];
     });
   }, []);
 
-  const removeBudget = useCallback((id: string) => {
+  cuseState<Budget[]>([])nst remuseState<Budget[]>([])veBudget = useCallback((id: string) => {
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   }, []);
 
-  return { budgets, addBudget, removeBudget, ready };
+  return { budgets, addBudget, remuseState<Budget[]>([])veBudget, ready };
 }
