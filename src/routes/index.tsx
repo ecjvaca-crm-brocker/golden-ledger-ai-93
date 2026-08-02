@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
   Activity,
+  Bot,
   Briefcase,
   FileDown,
   Landmark,
@@ -24,6 +25,7 @@ import { ExportPanel } from "@/components/finance/export-panel";
 import { BudgetPanel } from "@/components/finance/budget-panel";
 import { BankingPanel } from "@/components/finance/banking-panel";
 import { SavingsPanel } from "@/components/finance/savings-panel";
+import { Advisor360Panel } from "@/components/finance/advisor360-panel";
 import { SessionNav } from "@/components/finance/session-nav";
 import {
   CashflowChart,
@@ -155,6 +157,9 @@ function Index() {
             <TabsTrigger value="banca">
               <Sparkles className="mr-1.5 size-4" /> Banca &amp; IA
             </TabsTrigger>
+            <TabsTrigger value="asesor">
+              <Bot className="mr-1.5 size-4" /> Asesor 360
+            </TabsTrigger>
             <TabsTrigger value="salud">
               <Briefcase className="mr-1.5 size-4" /> Salud financiera
             </TabsTrigger>
@@ -213,6 +218,16 @@ function Index() {
               entries={entries}
               onAdd={addGoal}
               onRemove={removeGoal}
+            />
+          </TabsContent>
+
+          <TabsContent value="asesor" className="mt-6">
+            <Advisor360Panel
+              entries={entries}
+              goals={goals}
+              budgets={budgets}
+              products={products}
+              metrics={total}
             />
           </TabsContent>
 
