@@ -13,8 +13,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { diagnose360 } from "@/lib/advisor360.functions";
-import type { Advisor360Result } from "@/lib/advisor360.server";
+import { diagnose360, type Advisor360Result } from "@/lib/advisor360.functions";
 import { computeMetrics, formatMoney, type Entry, type Metrics } from "@/lib/finance";
 import { computeVariances, type Budget } from "@/lib/budget";
 import { monthlyNetFlow, projectGoal, type SavingsGoal } from "@/lib/savings";
@@ -102,7 +101,6 @@ export function Advisor360Panel({
             nombre: profile?.full_name ?? undefined,
             pais: profile?.country ?? undefined,
             ciudad: profile?.city ?? undefined,
-            age: undefined,
             edad: profile?.age ?? undefined,
             tipoCuenta: profile?.account_type ?? "personal",
             coberturas: {
@@ -111,7 +109,7 @@ export function Advisor360Panel({
               retiro: profile?.coverage_retirement ?? false,
               inversiones: profile?.coverage_investments ?? false,
             },
-          } as never,
+          },
           finanzas: {
             ingresos: total.income,
             gastos: total.expense,
