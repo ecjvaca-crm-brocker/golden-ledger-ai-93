@@ -56,16 +56,8 @@ export function budgetTotals(rows: BudgetVariance[]) {
 
 const KEY = "finanzas-presupuesto-v1";
 
-const SEED: Budget[] = [
-  { id: "b1", scope: "personal", accountCode: "5120", month: "2026-07", amount: 1100 },
-  { id: "b2", scope: "personal", accountCode: "5145", month: "2026-07", amount: 600 },
-  { id: "b3", scope: "personal", accountCode: "5140", month: "2026-07", amount: 250 },
-  { id: "b4", scope: "negocio", accountCode: "5105", month: "2026-07", amount: 6000 },
-  { id: "b5", scope: "negocio", accountCode: "5110", month: "2026-07", amount: 900 },
-];
-
 export function useBudgets() {
-  const [budgets, setBudgets] = useState<Budget[]>(SEED);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { SEED_ENTRIES, type Entry } from "./finance";
+import type { Entry } from "./finance";
 
 const KEY = "finanzas-ledger-v1";
 
 export function useLedger() {
-  const [entries, setEntries] = useState<Entry[]>(SEED_ENTRIES);
+  const [entries, setEntries] = useState<Entry[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

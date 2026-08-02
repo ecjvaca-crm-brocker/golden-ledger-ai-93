@@ -288,25 +288,3 @@ export function buildRecommendations(
   return recs;
 }
 
-export const SEED_ENTRIES: Entry[] = [
-  { id: "s1", date: "2026-05-05", description: "Salario mensual", amount: 4200, accountCode: "4135", scope: "personal" },
-  { id: "s2", date: "2026-05-06", description: "Arriendo vivienda", amount: 1100, accountCode: "5120", scope: "personal" },
-  { id: "s3", date: "2026-05-08", description: "Mercado del mes", amount: 620, accountCode: "5145", scope: "personal" },
-  { id: "s4", date: "2026-05-10", description: "Suscripciones y ocio", amount: 280, accountCode: "5160", scope: "personal" },
-  { id: "s5", date: "2026-05-12", description: "Saldo cuenta de ahorros", amount: 9800, accountCode: "1110", scope: "personal" },
-  { id: "s6", date: "2026-05-15", description: "Tarjeta de crédito", amount: 3100, accountCode: "2305", scope: "personal" },
-  { id: "s7", date: "2026-06-02", description: "Facturación servicios", amount: 12500, accountCode: "4105", scope: "negocio" },
-  { id: "s8", date: "2026-06-03", description: "Nómina equipo", amount: 6100, accountCode: "5105", scope: "negocio" },
-  { id: "s9", date: "2026-06-05", description: "Arriendo oficina", amount: 1400, accountCode: "5120", scope: "negocio" },
-  { id: "s10", date: "2026-06-07", description: "Servicios e internet", amount: 430, accountCode: "5135", scope: "negocio" },
-  { id: "s11", date: "2026-06-09", description: "Impuestos del período", amount: 980, accountCode: "5395", scope: "negocio" },
-  { id: "s12", date: "2026-06-11", description: "Cuenta corriente negocio", amount: 15200, accountCode: "1110", scope: "negocio" },
-  { id: "s13", date: "2026-06-14", description: "Crédito de capital de trabajo", amount: 7000, accountCode: "2105", scope: "negocio" },
-  { id: "s14", date: "2026-07-04", description: "Salario mensual", amount: 4200, accountCode: "4135", scope: "personal" },
-  { id: "s15", date: "2026-07-06", description: "Arriendo vivienda", amount: 1100, accountCode: "5120", scope: "personal" },
-  { id: "s16", date: "2026-07-09", description: "Transporte", amount: 320, accountCode: "5140", scope: "personal" },
-  { id: "s17", date: "2026-07-10", description: "Facturación servicios", amount: 14100, accountCode: "4105", scope: "negocio" },
-  { id: "s18", date: "2026-07-12", description: "Nómina equipo", amount: 6100, accountCode: "5105", scope: "negocio" },
-  { id: "s19", date: "2026-07-15", description: "Honorarios contables", amount: 750, accountCode: "5110", scope: "negocio" },
-  { id: "s20", date: "2026-07-18", description: "Intereses del crédito", amount: 210, accountCode: "5305", scope: "negocio" },
-];
