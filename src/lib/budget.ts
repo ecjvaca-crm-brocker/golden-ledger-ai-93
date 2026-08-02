@@ -56,8 +56,6 @@ export function budgetTotals(rows: BudgetVariance[]) {
 
 const KEY = "finanzas-presupuesto-v1";
 
-c
-
 export function useBudgets() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [ready, setReady] = useState(false);
