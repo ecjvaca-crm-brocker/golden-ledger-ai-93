@@ -288,4 +288,3 @@ export function buildRecommendations(
   return recs;
 }
 
-export const SEED_ENTRIES: Entry[] = [];

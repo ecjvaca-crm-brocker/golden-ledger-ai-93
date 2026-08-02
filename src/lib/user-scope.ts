@@ -15,10 +15,12 @@ export function syncUserScope(userId: string | null): boolean {
   if (typeof window === "undefined") return false;
   try {
     const previous = localStorage.getItem(OWNER_KEY);
-    if (previous === (userId ?? "")) return false;
+    const next = userId ?? "";
+    if (previous === next) return false;
+    const first = previous === null;
     DATA_KEYS.forEach((k) => localStorage.removeItem(k));
-    localStorage.setItem(OWNER_KEY, userId ?? "");
-    return true;
+    localStorage.setItem(OWNER_KEY, next);
+    return !first;
   } catch {
     return false;
   }
