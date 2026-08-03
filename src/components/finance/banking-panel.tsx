@@ -30,6 +30,7 @@ import {
   type ProductType,
 } from "@/lib/banking";
 import { analyzeFinances, type AiAnalysis } from "@/lib/ai-advisor.functions";
+import { ProductEditDialog } from "./edit-dialogs";
 
 const TYPE_ICON: Record<ProductType, typeof Landmark> = {
   ahorro: PiggyBank,
@@ -52,12 +53,14 @@ export function BankingPanel({
   metrics,
   onAdd,
   onRemove,
+  onUpdate,
 }: {
   products: BankProduct[];
   entries: Entry[];
   metrics: Metrics;
   onAdd: (p: Omit<BankProduct, "id">) => void;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<BankProduct, "id">) => void;
 }) {
   const [entity, setEntity] = useState("");
   const [alias, setAlias] = useState("");
@@ -129,7 +132,7 @@ export function BankingPanel({
         },
       });
       setAnalysis(result);
-      toast.success("Análisis de IA listo");
+      toast.success("Análisis listo");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "No se pudo generar el análisis.");
     } finally {
@@ -239,6 +242,8 @@ export function BankingPanel({
                     {p.rate ? ` · ${p.rate}% E.A.` : ""}
                   </p>
                 </div>
+                <div className="flex shrink-0 items-center">
+                <ProductEditDialog product={p} onSave={onUpdate} />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -247,6 +252,7 @@ export function BankingPanel({
                 >
                   <Trash2 className="size-4" />
                 </Button>
+                </div>
               </div>
               <p className="mt-4 font-display text-xl font-semibold tabular-nums">
                 {formatMoney(p.balance)}
@@ -276,13 +282,13 @@ export function BankingPanel({
               <Sparkles className="size-4 text-gold" /> Análisis inteligente de consumo
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              La IA revisa tus productos, compras e ingresos y señala gastos innecesarios,
+              Revisamos tus productos, compras e ingresos y señalamos gastos innecesarios,
               alertas y gastos que sí aportan a tu estilo de vida.
             </p>
           </div>
           <Button onClick={analyze} disabled={loading}>
             {loading ? <Loader2 className="mr-1.5 size-4 animate-spin" /> : null}
-            {loading ? "Analizando…" : "Analizar con IA"}
+            {loading ? "Analizando…" : "Analizar consumos"}
           </Button>
         </div>
 

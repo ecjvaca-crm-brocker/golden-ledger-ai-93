@@ -31,7 +31,6 @@ function Shell({
 }: {
   title: string;
   children: (close: () => void) => ReactNode;
-  onSave?: () => void;
   label: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -47,7 +46,6 @@ function Shell({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         {children(() => setOpen(false))}
-        {onSave ? null : null}
       </DialogContent>
     </Dialog>
   );

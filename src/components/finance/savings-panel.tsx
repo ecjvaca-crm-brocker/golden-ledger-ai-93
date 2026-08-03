@@ -27,11 +27,13 @@ export function SavingsPanel({
   entries,
   onAdd,
   onRemove,
+  onUpdate,
 }: {
   goals: SavingsGoal[];
   entries: Entry[];
   onAdd: (g: Omit<SavingsGoal, "id">) => void;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<SavingsGoal, "id">) => void;
 }) {
   const [name, setName] = useState("");
   const [scope, setScope] = useState<Scope>("personal");
@@ -158,7 +160,7 @@ export function SavingsPanel({
 
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => (
-          <GoalCard key={r.goal.id} row={r} netFlow={netFlow} onRemove={onRemove} />
+          <GoalCard key={r.goal.id} row={r} netFlow={netFlow} onRemove={onRemove} onUpdate={onUpdate} />
         ))}
         {rows.length === 0 && (
           <div className="surface-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
@@ -182,10 +184,12 @@ function GoalCard({
   row,
   netFlow,
   onRemove,
+  onUpdate,
 }: {
   row: GoalProjection;
   netFlow: number;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<SavingsGoal, "id">) => void;
 }) {
   const tone =
     row.status === "inviable"

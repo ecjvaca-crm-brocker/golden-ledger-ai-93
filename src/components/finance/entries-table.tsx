@@ -9,13 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { accountByCode, formatMoney, type Entry } from "@/lib/finance";
+import { EntryEditDialog } from "./edit-dialogs";
 
 export function EntriesTable({
   entries,
   onRemove,
+  onUpdate,
 }: {
   entries: Entry[];
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<Entry, "id">) => void;
 }) {
   const sorted = [...entries].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -55,7 +58,8 @@ export function EntriesTable({
                   >
                     {formatMoney(e.amount)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
+                    <EntryEditDialog entry={e} onSave={onUpdate} />
                     <Button
                       variant="ghost"
                       size="icon"
