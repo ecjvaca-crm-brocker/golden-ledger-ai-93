@@ -26,7 +26,6 @@ import type { SavingsGoal } from "@/lib/savings";
 function Shell({
   title,
   children,
-  onSave,
   label,
 }: {
   title: string;
