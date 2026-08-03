@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Info, Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GoalEditDialog } from "./edit-dialogs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -217,14 +218,17 @@ function GoalCard({
             {row.goal.scope} · objetivo {row.goal.deadline} · {row.monthsLeft} meses restantes
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Eliminar meta"
-          onClick={() => onRemove(row.goal.id)}
-        >
-          <Trash2 className="size-4" />
-        </Button>
+        <div className="flex shrink-0 items-center">
+          <GoalEditDialog goal={row.goal} onSave={onUpdate} />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Eliminar meta"
+            onClick={() => onRemove(row.goal.id)}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <div>
