@@ -8,6 +8,8 @@ import {
   healthScore,
   type Entry,
 } from "./finance";
+import { computeVariances, type Budget } from "./budget";
+import { type SavingsGoal } from "./savings";
 
 export interface ReportFilters {
   from: string;
@@ -23,6 +25,33 @@ export function filterEntries(entries: Entry[], f: ReportFilters): Entry[] {
     .filter((e) => (f.scope === "todos" ? true : e.scope === f.scope))
     .filter((e) => (f.accountCodes.length ? f.accountCodes.includes(e.accountCode) : true))
     .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export interface ReportExtras {
+  goals: SavingsGoal[];
+  budgets: Budget[];
+}
+
+export function periodBudgets(budgets: Budget[], f: ReportFilters): Budget[] {
+  const fromMonth = f.from ? f.from.slice(0, 7) : "";
+  const toMonth = f.to ? f.to.slice(0, 7) : "";
+  return budgets
+    .filter((b) => (fromMonth ? b.month >= fromMonth : true))
+    .filter((b) => (toMonth ? b.month <= toMonth : true))
+    .filter((b) => (f.scope === "todos" ? true : b.scope === f.scope));
+}
+
+export function goalRows(extras: ReportExtras | undefined, f: ReportFilters) {
+  return (extras?.goals ?? [])
+    .filter((g) => (f.scope === "todos" ? true : g.scope === f.scope))
+    .map((g) => ({
+      name: g.name,
+      scope: g.scope,
+      target: g.target,
+      saved: g.saved,
+      deadline: g.deadline,
+      progress: g.target > 0 ? Math.min(1, g.saved / g.target) : 0,
+    }));
 }
 
 const fileStamp = () => new Date().toISOString().slice(0, 10);
@@ -43,7 +72,7 @@ function download(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function exportCsv(entries: Entry[], f: ReportFilters) {
+export function exportCsv(entries: Entry[], f: ReportFilters, extras?: ReportExtras) {
   const rows = filterEntries(entries, f);
   const m = computeMetrics(rows);
   const head = ["Fecha", "Descripcion", "Codigo", "Cuenta", "Tipo", "Grupo", "Ambito", "Monto"];
@@ -77,6 +106,34 @@ export function exportCsv(entries: Entry[], f: ReportFilters) {
   lines.push(["Patrimonio", m.equity].map(csvCell).join(","));
   lines.push(["Tasa de ahorro", `${(m.savingsRate * 100).toFixed(1)}%`].map(csvCell).join(","));
 
+  const variances = computeVariances(periodBudgets(extras?.budgets ?? [], f), rows);
+  if (variances.length) {
+    lines.push("");
+    lines.push("Presupuesto vs real");
+    lines.push(["Categoria", "Ambito", "Mes", "Planeado", "Real", "Variacion"].join(","));
+    for (const v of variances) {
+      lines.push(
+        [v.accountName, v.budget.scope, v.budget.month, v.budget.amount, v.actual, v.variance]
+          .map(csvCell)
+          .join(","),
+      );
+    }
+  }
+
+  const goals = goalRows(extras, f);
+  if (goals.length) {
+    lines.push("");
+    lines.push("Metas de ahorro");
+    lines.push(["Meta", "Ambito", "Objetivo", "Ahorrado", "Avance", "Fecha limite"].join(","));
+    for (const g of goals) {
+      lines.push(
+        [g.name, g.scope, g.target, g.saved, `${(g.progress * 100).toFixed(1)}%`, g.deadline]
+          .map(csvCell)
+          .join(","),
+      );
+    }
+  }
+
   download(
     new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" }),
     `reporte-financiero-${fileStamp()}.csv`,
@@ -84,7 +141,7 @@ export function exportCsv(entries: Entry[], f: ReportFilters) {
   return rows.length;
 }
 
-export async function exportPdf(entries: Entry[], f: ReportFilters) {
+export async function exportPdf(entries: Entry[], f: ReportFilters, extras?: ReportExtras) {
   const [{ jsPDF }, autoTableMod] = await Promise.all([
     import("jspdf"),
     import("jspdf-autotable"),
@@ -161,6 +218,48 @@ export async function exportPdf(entries: Entry[], f: ReportFilters) {
     columnStyles: { 4: { halign: "right" } },
     margin: { left: 40, right: 40 },
   });
+
+  const variances = computeVariances(periodBudgets(extras?.budgets ?? [], f), rows);
+  if (variances.length) {
+    autoTable(doc, {
+      startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 24,
+      head: [["Presupuesto - categoria", "Ambito", "Mes", "Planeado", "Real", "Variacion"]],
+      body: variances.map((v) => [
+        v.accountName,
+        v.budget.scope,
+        v.budget.month,
+        formatMoney(v.budget.amount),
+        formatMoney(v.actual),
+        formatMoney(v.variance),
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: navy, textColor: 255 },
+      styles: { fontSize: 8, cellPadding: 4 },
+      columnStyles: { 3: { halign: "right" }, 4: { halign: "right" }, 5: { halign: "right" } },
+      margin: { left: 40, right: 40 },
+    });
+  }
+
+  const goals = goalRows(extras, f);
+  if (goals.length) {
+    autoTable(doc, {
+      startY: (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 24,
+      head: [["Meta de ahorro", "Ambito", "Objetivo", "Ahorrado", "Avance", "Fecha limite"]],
+      body: goals.map((g) => [
+        g.name,
+        g.scope,
+        formatMoney(g.target),
+        formatMoney(g.saved),
+        `${(g.progress * 100).toFixed(1)}%`,
+        g.deadline,
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: gold, textColor: 255 },
+      styles: { fontSize: 8, cellPadding: 4 },
+      columnStyles: { 2: { halign: "right" }, 3: { halign: "right" }, 4: { halign: "right" } },
+      margin: { left: 40, right: 40 },
+    });
+  }
 
   const pages = doc.getNumberOfPages();
   for (let i = 1; i <= pages; i++) {
