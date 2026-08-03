@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, LogOut, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft, LogOut, ShieldCheck, Users, UserRound } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { isAdminUser, migrateAccountData } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -59,6 +61,11 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [email, setEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [targetEmail, setTargetEmail] = useState("");
+  const [migrating, setMigrating] = useState(false);
+  const checkAdmin = useServerFn(isAdminUser);
+  const migrate = useServerFn(migrateAccountData);
   const [form, setForm] = useState({
     full_name: "",
     country: "",
@@ -96,6 +103,12 @@ function ProfilePage() {
           coverage_retirement: data.coverage_retirement,
           coverage_investments: data.coverage_investments,
         });
+      }
+      try {
+        const admin = await checkAdmin({});
+        if (active) setIsAdmin(admin);
+      } catch {
+        /* sin rol admin */
       }
       if (active) setLoading(false);
     })();
@@ -138,6 +151,23 @@ function ProfilePage() {
       return;
     }
     toast.success("Perfil actualizado");
+  };
+
+  const runMigration = async () => {
+    if (!targetEmail.trim()) {
+      toast.error("Escribe el correo de la cuenta destino.");
+      return;
+    }
+    setMigrating(true);
+    try {
+      const result = await migrate({ data: { targetEmail: targetEmail.trim() } });
+      toast.success(`Migramos ${result.moved} registros a ${result.targetEmail}.`);
+      setTargetEmail("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No pudimos migrar los datos.");
+    } finally {
+      setMigrating(false);
+    }
   };
 
   const signOut = async () => {
@@ -269,6 +299,45 @@ function ProfilePage() {
               {saving ? "Guardando…" : "Guardar perfil"}
             </Button>
           </form>
+        )}
+
+        {!loading && (
+          <section className="surface-card mt-6 space-y-3 p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold">
+              <ArrowRightLeft className="size-4 text-gold" /> Migrar datos a otra cuenta
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Transfiere tus movimientos, presupuestos, productos bancarios y metas al correo
+              indicado. La cuenta destino debe haber iniciado sesión al menos una vez.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Input
+                type="email"
+                value={targetEmail}
+                onChange={(e) => setTargetEmail(e.target.value)}
+                placeholder="nuevo-correo@dominio.com"
+              />
+              <Button variant="outline" onClick={runMigration} disabled={migrating}>
+                {migrating ? "Migrando…" : "Migrar datos"}
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {!loading && isAdmin && (
+          <section className="surface-card mt-6 flex flex-wrap items-center justify-between gap-3 p-6">
+            <div>
+              <h2 className="flex items-center gap-2 text-sm font-semibold">
+                <Users className="size-4 text-gold" /> Panel de administración
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Consulta los usuarios registrados y su actividad.
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/admin">Abrir panel</Link>
+            </Button>
+          </section>
         )}
       </main>
     </div>

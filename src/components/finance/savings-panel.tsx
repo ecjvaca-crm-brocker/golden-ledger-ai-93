@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Info, Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GoalEditDialog } from "./edit-dialogs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
@@ -27,11 +28,13 @@ export function SavingsPanel({
   entries,
   onAdd,
   onRemove,
+  onUpdate,
 }: {
   goals: SavingsGoal[];
   entries: Entry[];
   onAdd: (g: Omit<SavingsGoal, "id">) => void;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<SavingsGoal, "id">) => void;
 }) {
   const [name, setName] = useState("");
   const [scope, setScope] = useState<Scope>("personal");
@@ -158,7 +161,7 @@ export function SavingsPanel({
 
       <div className="grid gap-4 md:grid-cols-2">
         {rows.map((r) => (
-          <GoalCard key={r.goal.id} row={r} netFlow={netFlow} onRemove={onRemove} />
+          <GoalCard key={r.goal.id} row={r} netFlow={netFlow} onRemove={onRemove} onUpdate={onUpdate} />
         ))}
         {rows.length === 0 && (
           <div className="surface-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
@@ -182,10 +185,12 @@ function GoalCard({
   row,
   netFlow,
   onRemove,
+  onUpdate,
 }: {
   row: GoalProjection;
   netFlow: number;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Omit<SavingsGoal, "id">) => void;
 }) {
   const tone =
     row.status === "inviable"
@@ -213,14 +218,17 @@ function GoalCard({
             {row.goal.scope} · objetivo {row.goal.deadline} · {row.monthsLeft} meses restantes
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Eliminar meta"
-          onClick={() => onRemove(row.goal.id)}
-        >
-          <Trash2 className="size-4" />
-        </Button>
+        <div className="flex shrink-0 items-center">
+          <GoalEditDialog goal={row.goal} onSave={onUpdate} />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Eliminar meta"
+            onClick={() => onRemove(row.goal.id)}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <div>

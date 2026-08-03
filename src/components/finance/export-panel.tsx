@@ -14,17 +14,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  accountByCode,
   ACCOUNT_TYPE_LABEL,
   CHART_OF_ACCOUNTS,
   formatMoney,
   type AccountType,
   type Entry,
 } from "@/lib/finance";
-import { exportCsv, exportPdf, filterEntries, type ReportFilters } from "@/lib/export-report";
+import {
+  exportCsv,
+  exportPdf,
+  filterEntries,
+  goalRows,
+  periodBudgets,
+  type ReportFilters,
+} from "@/lib/export-report";
+import { computeVariances, type Budget } from "@/lib/budget";
+import type { SavingsGoal } from "@/lib/savings";
 
 const TYPES: AccountType[] = ["activo", "pasivo", "patrimonio", "ingreso", "gasto"];
 
-export function ExportPanel({ entries }: { entries: Entry[] }) {
+export function ExportPanel({
+  entries,
+  budgets = [],
+  goals = [],
+}: {
+  entries: Entry[];
+  budgets?: Budget[];
+  goals?: SavingsGoal[];
+}) {
   const dates = entries.map((e) => e.date).sort();
   const [from, setFrom] = useState(dates[0] ?? "");
   const [to, setTo] = useState(dates[dates.length - 1] ?? "");
@@ -34,7 +52,30 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
 
   const filters: ReportFilters = { from, to, scope, accountCodes: codes };
   const preview = useMemo(() => filterEntries(entries, filters), [entries, from, to, scope, codes]);
-  const total = preview.reduce((s, e) => s + e.amount, 0);
+  const totals = useMemo(() => {
+    let income = 0;
+    let expense = 0;
+    for (const e of preview) {
+      const type = accountByCode(e.accountCode)?.type;
+      if (type === "ingreso") income += e.amount;
+      if (type === "gasto") expense += e.amount;
+    }
+    return { income, expense, net: income - expense };
+  }, [preview]);
+  const variances = useMemo(
+    () => computeVariances(periodBudgets(budgets, filters), preview),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [budgets, preview, from, to, scope],
+  );
+  const goalsInScope = useMemo(
+    () => goalRows({ goals, budgets }, filters),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [goals, budgets, scope],
+  );
+  const plannedTotal = variances.reduce((s, v) => s + v.budget.amount, 0);
+  const savedTotal = goalsInScope.reduce((s, g) => s + g.saved, 0);
+  const targetTotal = goalsInScope.reduce((s, g) => s + g.target, 0);
+  const extras = { goals, budgets };
 
   const toggle = (code: string) =>
     setCodes((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
@@ -54,7 +95,10 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
     }
     try {
       setLoading(true);
-      const n = kind === "csv" ? exportCsv(entries, filters) : await exportPdf(entries, filters);
+      const n =
+        kind === "csv"
+          ? exportCsv(entries, filters, extras)
+          : await exportPdf(entries, filters, extras);
       toast.success(`Reporte ${kind.toUpperCase()} generado con ${n} movimientos`);
     } catch {
       toast.error("No se pudo generar el reporte");
@@ -98,12 +142,30 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
           </Select>
         </div>
 
-        <div className="rounded-lg border bg-muted/30 p-4">
-          <p className="text-xs text-muted-foreground">Movimientos incluidos</p>
-          <p className="font-display text-2xl font-semibold">{preview.length}</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Suma de montos: <span className="tabular-nums">{formatMoney(total)}</span>
-          </p>
+        <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+          <div>
+            <p className="text-xs text-muted-foreground">Movimientos incluidos</p>
+            <p className="font-display text-2xl font-semibold">{preview.length}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <SummaryStat label="Ingresos" value={formatMoney(totals.income)} tone="text-success" />
+            <SummaryStat
+              label="Gastos"
+              value={formatMoney(totals.expense)}
+              tone="text-destructive"
+            />
+            <SummaryStat label="Resultado neto" value={formatMoney(totals.net)} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 border-t pt-3">
+            <SummaryStat
+              label="Presupuesto planeado"
+              value={formatMoney(plannedTotal)}
+            />
+            <SummaryStat
+              label={`Metas (${goalsInScope.length})`}
+              value={`${formatMoney(savedTotal)} de ${formatMoney(targetTotal)}`}
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
@@ -142,7 +204,30 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
           </Button>
         </div>
 
-        <ScrollArea className="mt-4 h-[360px] pr-3">
+        <div className="mt-4">
+          <Label className="text-xs">Vista de cuentas</Label>
+          <Select
+            value={codes.length === 1 ? (codes[0] as string) : "todas"}
+            onValueChange={(v) => setCodes(v === "todas" ? [] : [v])}
+          >
+            <SelectTrigger className="mt-1.5 w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-72">
+              <SelectItem value="todas">Todas las cuentas (consolidado)</SelectItem>
+              {CHART_OF_ACCOUNTS.map((a) => (
+                <SelectItem key={a.code} value={a.code}>
+                  {a.code} · {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="mt-1.5 text-xs text-muted-foreground">
+            O marca varias cuentas abajo para un reporte combinado.
+          </p>
+        </div>
+
+        <ScrollArea className="mt-4 h-[320px] pr-3">
           <div className="space-y-5">
             {TYPES.map((type) => {
               const accounts = CHART_OF_ACCOUNTS.filter((a) => a.type === type);
@@ -176,6 +261,23 @@ export function ExportPanel({ entries }: { entries: Entry[] }) {
           </div>
         </ScrollArea>
       </div>
+    </div>
+  );
+}
+
+function SummaryStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone?: string;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className={`mt-0.5 text-sm font-semibold tabular-nums ${tone ?? ""}`}>{value}</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCloudCollection, num, str, type Row } from "./cloud-store";
 import { monthKey, type Entry, type Scope } from "./finance";
 import { accountByCode } from "./finance";
 
@@ -70,40 +70,35 @@ export function goalTotals(rows: GoalProjection[]) {
   };
 }
 
-const KEY = "finanzas-metas-ahorro-v1";
+const fromRow = (r: Row): SavingsGoal => ({
+  id: str(r["id"]),
+  name: str(r["name"]),
+  scope: str(r["scope"]) as Scope,
+  target: num(r["target"]),
+  saved: num(r["saved"]),
+  deadline: str(r["deadline"]),
+});
 
-
+const toRow = (g: Partial<Omit<SavingsGoal, "id">>): Row => {
+  const row: Row = {};
+  if (g.name !== undefined) row["name"] = g.name;
+  if (g.scope !== undefined) row["scope"] = g.scope;
+  if (g.target !== undefined) row["target"] = g.target;
+  if (g.saved !== undefined) row["saved"] = g.saved;
+  if (g.deadline !== undefined) row["deadline"] = g.deadline;
+  return row;
+};
 
 export function useSavingsGoals() {
-  const [goals, setGoals] = useState<SavingsGoal[]>([]);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setGoals(JSON.parse(raw) as SavingsGoal[]);
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(KEY, JSON.stringify(goals));
-    } catch {
-      /* ignore */
-    }
-  }, [goals, ready]);
-
-  const addGoal = useCallback((g: Omit<SavingsGoal, "id">) => {
-    setGoals((prev) => [{ ...g, id: crypto.randomUUID() }, ...prev]);
-  }, []);
-
-  const removeGoal = useCallback((id: string) => {
-    setGoals((prev) => prev.filter((g) => g.id !== id));
-  }, []);
-
-  return { goals, addGoal, removeGoal, ready };
+  const c = useCloudCollection<SavingsGoal>("savings_goals", fromRow, toRow, {
+    column: "deadline",
+    ascending: true,
+  });
+  return {
+    goals: c.items,
+    addGoal: c.add,
+    updateGoal: c.update,
+    removeGoal: c.remove,
+    ready: c.ready,
+  };
 }

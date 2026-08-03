@@ -59,10 +59,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { entries, addEntry, removeEntry } = useLedger();
-  const { budgets, addBudget, removeBudget } = useBudgets();
-  const { products, addProduct, removeProduct } = useBankProducts();
-  const { goals, addGoal, removeGoal } = useSavingsGoals();
+  const { entries, addEntry, removeEntry, updateEntry } = useLedger();
+  const { budgets, addBudget, removeBudget, updateBudget } = useBudgets();
+  const { products, addProduct, removeProduct, updateProduct } = useBankProducts();
+  const { goals, addGoal, removeGoal, updateGoal } = useSavingsGoals();
 
   const personalEntries = useMemo(
     () => entries.filter((e) => e.scope === "personal"),
@@ -155,7 +155,7 @@ function Index() {
               <Sprout className="mr-1.5 size-4" /> Metas de ahorro
             </TabsTrigger>
             <TabsTrigger value="banca">
-              <Sparkles className="mr-1.5 size-4" /> Banca &amp; IA
+              <Sparkles className="mr-1.5 size-4" /> Banca
             </TabsTrigger>
             <TabsTrigger value="asesor">
               <Bot className="mr-1.5 size-4" /> Asesor 360
@@ -186,7 +186,7 @@ function Index() {
 
           <TabsContent value="movimientos" className="mt-6 space-y-6">
             <EntryForm onAdd={addEntry} />
-            <EntriesTable entries={entries} onRemove={removeEntry} />
+            <EntriesTable entries={entries} onRemove={removeEntry} onUpdate={updateEntry} />
           </TabsContent>
 
           <TabsContent value="cuentas" className="mt-6">
@@ -199,6 +199,7 @@ function Index() {
               entries={entries}
               onAdd={addBudget}
               onRemove={removeBudget}
+              onUpdate={updateBudget}
             />
           </TabsContent>
 
@@ -209,6 +210,7 @@ function Index() {
               metrics={personal}
               onAdd={addProduct}
               onRemove={removeProduct}
+              onUpdate={updateProduct}
             />
           </TabsContent>
 
@@ -218,6 +220,7 @@ function Index() {
               entries={entries}
               onAdd={addGoal}
               onRemove={removeGoal}
+              onUpdate={updateGoal}
             />
           </TabsContent>
 
@@ -240,7 +243,7 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="reportes" className="mt-6">
-            <ExportPanel entries={entries} />
+            <ExportPanel entries={entries} budgets={budgets} goals={goals} />
           </TabsContent>
         </Tabs>
       </main>

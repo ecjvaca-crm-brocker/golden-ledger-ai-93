@@ -36,11 +36,13 @@ export function BudgetPanel({
   entries,
   onAdd,
   onRemove,
+  onUpdate,
 }: {
   budgets: Budget[];
   entries: Entry[];
   onAdd: (b: Omit<Budget, "id">) => void;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Partial<Omit<Budget, "id">>) => void;
 }) {
   const months = useMemo(() => {
     const set = new Set<string>([currentMonth(), ...budgets.map((b) => b.month)]);
@@ -161,8 +163,8 @@ export function BudgetPanel({
       )}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <VarianceTable title="Presupuesto personal" rows={personal} onRemove={onRemove} />
-        <VarianceTable title="Presupuesto del negocio" rows={business} onRemove={onRemove} />
+        <VarianceTable title="Presupuesto personal" rows={personal} onRemove={onRemove} onUpdate={onUpdate} />
+        <VarianceTable title="Presupuesto del negocio" rows={business} onRemove={onRemove} onUpdate={onUpdate} />
       </div>
     </div>
   );
@@ -172,10 +174,12 @@ function VarianceTable({
   title,
   rows,
   onRemove,
+  onUpdate,
 }: {
   title: string;
   rows: BudgetVariance[];
   onRemove: (id: string) => void;
+  onUpdate: (id: string, value: Partial<Omit<Budget, "id">>) => void;
 }) {
   const t = budgetTotals(rows);
   return (
@@ -208,8 +212,21 @@ function VarianceTable({
                   <div className="font-medium">{r.accountName}</div>
                   <Progress value={Math.min(100, r.usage * 100)} className="mt-1.5 h-1.5 w-32" />
                 </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {formatMoney(r.budget.amount)}
+                <TableCell className="text-right">
+                  <Input
+                    type="number"
+                    step="0.01"
+                    aria-label={`Editar presupuesto de ${r.accountName}`}
+                    defaultValue={r.budget.amount}
+                    onBlur={(e) => {
+                      const value = Number(e.target.value);
+                      if (Number.isFinite(value) && value !== r.budget.amount) {
+                        onUpdate(r.budget.id, { amount: value });
+                        toast.success("Presupuesto actualizado");
+                      }
+                    }}
+                    className="ml-auto h-8 w-28 text-right tabular-nums"
+                  />
                 </TableCell>
                 <TableCell className="text-right tabular-nums">{formatMoney(r.actual)}</TableCell>
                 <TableCell
