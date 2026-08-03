@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCloudCollection, num, str, type Row } from "./cloud-store";
 import { accountByCode, monthKey, type Entry, type Scope } from "./finance";
 
 export interface Budget {
@@ -54,44 +54,42 @@ export function budgetTotals(rows: BudgetVariance[]) {
   };
 }
 
-const KEY = "finanzas-presupuesto-v1";
+const fromRow = (r: Row): Budget => ({
+  id: str(r["id"]),
+  scope: str(r["scope"]) as Scope,
+  accountCode: str(r["account_code"]),
+  month: str(r["month"]),
+  amount: num(r["amount"]),
+});
+
+const toRow = (b: Partial<Omit<Budget, "id">>): Row => {
+  const row: Row = {};
+  if (b.scope !== undefined) row["scope"] = b.scope;
+  if (b.accountCode !== undefined) row["account_code"] = b.accountCode;
+  if (b.month !== undefined) row["month"] = b.month;
+  if (b.amount !== undefined) row["amount"] = b.amount;
+  return row;
+};
 
 export function useBudgets() {
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [ready, setReady] = useState(false);
+  const c = useCloudCollection<Budget>("budgets", fromRow, toRow, {
+    column: "month",
+    ascending: false,
+  });
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setBudgets(JSON.parse(raw) as Budget[]);
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
-  }, []);
+  const addBudget = async (b: Omit<Budget, "id">) => {
+    const existing = c.items.find(
+      (p) => p.scope === b.scope && p.accountCode === b.accountCode && p.month === b.month,
+    );
+    if (existing) await c.update(existing.id, { amount: b.amount });
+    else await c.add(b);
+  };
 
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(KEY, JSON.stringify(budgets));
-    } catch {
-      /* ignore */
-    }
-  }, [budgets, ready]);
-
-  const addBudget = useCallback((b: Omit<Budget, "id">) => {
-    setBudgets((prev) => {
-      const existing = prev.find(
-        (p) => p.scope === b.scope && p.accountCode === b.accountCode && p.month === b.month,
-      );
-      if (existing) return prev.map((p) => (p.id === existing.id ? { ...p, amount: b.amount } : p));
-      return [{ ...b, id: crypto.randomUUID() }, ...prev];
-    });
-  }, []);
-
-  const removeBudget = useCallback((id: string) => {
-    setBudgets((prev) => prev.filter((b) => b.id !== id));
-  }, []);
-
-  return { budgets, addBudget, removeBudget, ready };
+  return {
+    budgets: c.items,
+    addBudget,
+    updateBudget: c.update,
+    removeBudget: c.remove,
+    ready: c.ready,
+  };
 }

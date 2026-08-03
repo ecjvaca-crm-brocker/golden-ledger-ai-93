@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCloudCollection, num, str, type Row } from "./cloud-store";
 
 export type ProductType = "ahorro" | "corriente" | "inversion" | "tarjeta" | "credito";
 
@@ -20,42 +20,39 @@ export interface BankProduct {
   rate?: number; // tasa % E.A.
 }
 
-const KEY = "finanzas-productos-v1";
+const fromRow = (r: Row): BankProduct => ({
+  id: str(r["id"]),
+  entity: str(r["entity"]),
+  type: str(r["type"]) as ProductType,
+  alias: str(r["alias"]),
+  balance: num(r["balance"]),
+  limit: r["credit_limit"] == null ? undefined : num(r["credit_limit"]),
+  rate: r["rate"] == null ? undefined : num(r["rate"]),
+});
 
-
+const toRow = (p: Partial<Omit<BankProduct, "id">>): Row => {
+  const row: Row = {};
+  if (p.entity !== undefined) row["entity"] = p.entity;
+  if (p.type !== undefined) row["type"] = p.type;
+  if (p.alias !== undefined) row["alias"] = p.alias;
+  if (p.balance !== undefined) row["balance"] = p.balance;
+  if ("limit" in p) row["credit_limit"] = p.limit ?? null;
+  if ("rate" in p) row["rate"] = p.rate ?? null;
+  return row;
+};
 
 export function useBankProducts() {
-  const [products, setProducts] = useState<BankProduct[]>([]);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setProducts(JSON.parse(raw) as BankProduct[]);
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      localStorage.setItem(KEY, JSON.stringify(products));
-    } catch {
-      /* ignore */
-    }
-  }, [products, ready]);
-
-  const addProduct = useCallback((p: Omit<BankProduct, "id">) => {
-    setProducts((prev) => [{ ...p, id: crypto.randomUUID() }, ...prev]);
-  }, []);
-
-  const removeProduct = useCallback((id: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-  }, []);
-
-  return { products, addProduct, removeProduct, ready };
+  const c = useCloudCollection<BankProduct>("bank_products", fromRow, toRow, {
+    column: "created_at",
+    ascending: false,
+  });
+  return {
+    products: c.items,
+    addProduct: c.add,
+    updateProduct: c.update,
+    removeProduct: c.remove,
+    ready: c.ready,
+  };
 }
 
 export function productSummary(products: BankProduct[]) {
