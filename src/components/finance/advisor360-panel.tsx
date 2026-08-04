@@ -156,7 +156,7 @@ export function Advisor360Panel({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-xl">
             <h2 className="flex items-center gap-2 font-display text-lg font-semibold">
-              <Bot className="size-5 text-gold" /> Agente IA — Asesor Financiero 360
+              <Bot className="size-5 text-gold" /> Asesor Inteligente
             </h2>
             <p className="mt-1.5 text-sm text-muted-foreground">
               Cruza tu perfil y coberturas con el flujo de caja, presupuesto y metas para entregar
