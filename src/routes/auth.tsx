@@ -9,13 +9,13 @@ import { useSession } from "@/lib/use-session";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Iniciar sesión | Consultoría financiera personal y de negocio" },
+      { title: "Iniciar sesión | ESCALA Cash Flow" },
       {
         name: "description",
         content:
           "Accede con Google, Apple o Microsoft para guardar tu perfil financiero, presupuestos y metas de ahorro de forma segura.",
       },
-      { property: "og:title", content: "Iniciar sesión | Consultoría financiera personal y de negocio" },
+      { property: "og:title", content: "Iniciar sesión | ESCALA Cash Flow" },
       {
         property: "og:description",
         content:
@@ -62,9 +62,9 @@ function AuthPage() {
       <div className="w-full max-w-md">
         <div className="navy-panel rounded-2xl p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-            Consultoría financiera
+            ESCALA Cash Flow
           </p>
-          <h1 className="mt-3 text-2xl font-semibold">Accede a tu tablero financiero</h1>
+          <h1 className="mt-3 text-2xl font-semibold">Accede a ESCALA Cash Flow</h1>
           <p className="mt-2 text-sm text-primary-foreground/75">
             Guarda tu perfil, presupuestos, coberturas y metas de ahorro en un solo lugar.
           </p>

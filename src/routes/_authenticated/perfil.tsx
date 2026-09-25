@@ -21,13 +21,13 @@ import { isAdminUser, migrateAccountData } from "@/lib/admin.functions";
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
-      { title: "Mi perfil financiero | Datos y coberturas" },
+      { title: "Mi perfil | ESCALA Cash Flow" },
       {
         name: "description",
         content:
           "Registra tu nombre, país, ciudad, edad, tipo de cuenta y las coberturas de salud, vida, retiro e inversiones que tienes al día.",
       },
-      { property: "og:title", content: "Mi perfil financiero | Datos y coberturas" },
+      { property: "og:title", content: "Mi perfil | ESCALA Cash Flow" },
       {
         property: "og:description",
         content:
@@ -44,6 +44,7 @@ const schema = z.object({
   full_name: z.string().trim().min(2, "Ingresa tu nombre completo.").max(120),
   country: z.string().trim().min(2, "Ingresa tu país.").max(80),
   city: z.string().trim().min(2, "Ingresa tu ciudad.").max(80),
+  phone: z.string().trim().regex(/^\+?[0-9\s()-]{7,20}$/, "Ingresa un número de celular válido."),
   age: z.number().int().min(16, "La edad debe ser mayor a 16.").max(110, "Edad no válida."),
 });
 
@@ -68,6 +69,7 @@ function ProfilePage() {
   const migrate = useServerFn(migrateAccountData);
   const [form, setForm] = useState({
     full_name: "",
+    phone: "",
     country: "",
     city: "",
     age: "",
@@ -94,6 +96,7 @@ function ProfilePage() {
       if (active && data) {
         setForm({
           full_name: data.full_name ?? "",
+          phone: data.phone ?? "",
           country: data.country ?? "",
           city: data.city ?? "",
           age: data.age != null ? String(data.age) : "",
@@ -121,6 +124,7 @@ function ProfilePage() {
     ev.preventDefault();
     const parsed = schema.safeParse({
       full_name: form.full_name,
+      phone: form.phone,
       country: form.country,
       city: form.city,
       age: Number(form.age),
@@ -136,6 +140,11 @@ function ProfilePage() {
       setSaving(false);
       return;
     }
+    const { data: prev } = await supabase
+      .from("profiles")
+      .select("sheets_synced")
+      .eq("id", user.id)
+      .maybeSingle();
     const { error } = await supabase.from("profiles").upsert({
       id: user.id,
       ...parsed.data,
@@ -151,6 +160,30 @@ function ProfilePage() {
       return;
     }
     toast.success("Perfil actualizado");
+    if (!prev?.sheets_synced) {
+      // Registro nuevo: enviar a Google Sheets en segundo plano (no bloquea)
+      void (async () => {
+        try {
+          await fetch(
+            "https://script.google.com/macros/s/AKfycbzJbNYXwH0mxzL77HXQZZz1Rt7YvNVwasA5-NMpI_ZUNxnV29mYWF_v9YXcSc1LesXj/exec",
+            {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                origen: "app_lovable",
+                nombre: parsed.data.full_name,
+                email: user.email ?? "",
+                telefono: parsed.data.phone,
+              }),
+            },
+          );
+          await supabase.from("profiles").update({ sheets_synced: true }).eq("id", user.id);
+        } catch (e) {
+          console.warn("Webhook Google Sheets falló", e);
+        }
+      })();
+    }
   };
 
   const runMigration = async () => {
@@ -217,6 +250,22 @@ function ProfilePage() {
                   maxLength={120}
                   onChange={(e) => setForm({ ...form, full_name: e.target.value })}
                   placeholder="Nombre y apellido"
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Correo electrónico</Label>
+                <Input value={email} disabled className="mt-1.5" />
+              </div>
+              <div>
+                <Label className="text-xs">Celular / teléfono *</Label>
+                <Input
+                  type="tel"
+                  required
+                  value={form.phone}
+                  maxLength={20}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="+593 99 123 4567"
                   className="mt-1.5"
                 />
               </div>
