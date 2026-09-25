@@ -41,13 +41,13 @@ import { buildRecommendations, computeMetrics, formatMoney } from "@/lib/finance
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
+      { title: "ESCALA Cash Flow | Finanzas personales y de negocio NIIF" },
       {
         name: "description",
         content:
           "Controla ingresos, gastos por categoría contable NIIF, indicadores de salud financiera y recomendaciones de presupuesto personal y empresarial.",
       },
-      { property: "og:title", content: "Tracker Financiero Personal y de Negocio | Plan de cuentas NIIF" },
+      { property: "og:title", content: "ESCALA Cash Flow | Finanzas personales y de negocio NIIF" },
       {
         property: "og:description",
         content:
@@ -84,12 +84,12 @@ function Index() {
         <div className="mx-auto max-w-7xl px-5 py-10">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-              Consultoría financiera
+              ESCALA Cash Flow
             </p>
             <SessionNav />
           </div>
           <h1 className="mt-3 max-w-2xl text-3xl font-semibold md:text-4xl">
-            Tracker de finanzas personales y de negocio
+            ESCALA Cash Flow
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-primary-foreground/75">
             Registra ingresos y gastos con plan de cuentas NIIF, consolida todas tus cuentas y
