@@ -84,7 +84,7 @@ function Index() {
         <div className="mx-auto max-w-7xl px-5 py-10">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
-              ESCALA Cash Flow
+              Finanzas personales y de negocio
             </p>
             <SessionNav />
           </div>
