@@ -166,7 +166,7 @@ function ProfilePage() {
       void (async () => {
         try {
           await fetch(
-            "https://script.google.com/macros/s/AKfycbzJbNYXwH0mxzL77HXQZZz1Rt7YvNVwasA5-NMpI_ZUNxnV29mYWF_v9YXcSc1LesXj/exec",
+            "https://script.google.com/macros/s/AKfycbxIOsYkcuX-7WdRg1PoY0S5CM3j6CXOSwNTV9bF34XMo_IvOX6PWh_Ov0tLZHgfZppp/exec",
             {
               method: "POST",
               mode: "no-cors",

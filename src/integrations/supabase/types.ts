@@ -122,6 +122,30 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding: {
+        Row: {
+          answers: Json
+          created_at: string
+          roadmap: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          roadmap?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          roadmap?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
