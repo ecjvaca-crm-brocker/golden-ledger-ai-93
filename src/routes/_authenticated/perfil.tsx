@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { isAdminUser, migrateAccountData } from "@/lib/admin.functions";
+import { COUNTRIES, dialFor } from "@/lib/countries";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -94,13 +95,16 @@ function ProfilePage() {
         .maybeSingle();
       if (error) toast.error("No pudimos cargar tu perfil.");
       if (active && data) {
+        const dial = dialFor(data.country ?? "");
+        let phone = (data.phone ?? "").replace(/\s/g, "");
+        if (dial && phone.startsWith(dial)) phone = phone.slice(dial.length);
         setForm({
           full_name: data.full_name ?? "",
-          phone: data.phone ?? "",
+          phone: phone.replace(/[^0-9]/g, ""),
           country: data.country ?? "",
           city: data.city ?? "",
           age: data.age != null ? String(data.age) : "",
-          account_type: data.account_type,
+          account_type: data.account_type ?? "personal",
           coverage_health: data.coverage_health,
           coverage_life: data.coverage_life,
           coverage_retirement: data.coverage_retirement,
@@ -122,9 +126,13 @@ function ProfilePage() {
 
   const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
+    if (!form.country) {
+      toast.error("Selecciona tu país.");
+      return;
+    }
     const parsed = schema.safeParse({
       full_name: form.full_name,
-      phone: form.phone,
+      phone: `${dialFor(form.country)}${form.phone}`,
       country: form.country,
       city: form.city,
       age: Number(form.age),
@@ -258,26 +266,41 @@ function ProfilePage() {
                 <Input value={email} disabled className="mt-1.5" />
               </div>
               <div>
-                <Label className="text-xs">Celular / teléfono *</Label>
-                <Input
-                  type="tel"
-                  required
-                  value={form.phone}
-                  maxLength={20}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="+593 99 123 4567"
-                  className="mt-1.5"
-                />
+                <Label className="text-xs">País</Label>
+                <select
+                  value={form.country}
+                  onChange={(e) => setForm({ ...form, country: e.target.value })}
+                  className="mt-1.5 flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Selecciona tu país</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name} ({c.dial})
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
-                <Label className="text-xs">País</Label>
-                <Input
-                  value={form.country}
-                  maxLength={80}
-                  onChange={(e) => setForm({ ...form, country: e.target.value })}
-                  placeholder="Colombia"
-                  className="mt-1.5"
-                />
+                <Label className="text-xs">Celular *</Label>
+                <div className="mt-1.5 flex gap-2">
+                  <Input
+                    value={dialFor(form.country) || "+"}
+                    disabled
+                    className="w-20 text-center"
+                    aria-label="Prefijo del país"
+                  />
+                  <Input
+                    type="tel"
+                    inputMode="numeric"
+                    required
+                    value={form.phone}
+                    maxLength={15}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value.replace(/[^0-9]/g, "") })
+                    }
+                    placeholder="991234567"
+                  />
+                </div>
               </div>
               <div>
                 <Label className="text-xs">Ciudad</Label>
@@ -285,38 +308,41 @@ function ProfilePage() {
                   value={form.city}
                   maxLength={80}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  placeholder="Bogotá"
+                  placeholder="Quito"
                   className="mt-1.5"
                 />
               </div>
               <div>
                 <Label className="text-xs">Edad</Label>
                 <Input
-                  type="number"
-                  min="16"
-                  max="110"
+                  type="text"
+                  inputMode="numeric"
                   value={form.age}
-                  onChange={(e) => setForm({ ...form, age: e.target.value })}
-                  placeholder="35"
+                  maxLength={3}
+                  onChange={(e) => setForm({ ...form, age: e.target.value.replace(/[^0-9]/g, "") })}
+                  placeholder="Escribe tu edad"
                   className="mt-1.5"
                 />
               </div>
-              <div>
+              <div className="md:col-span-2">
                 <Label className="text-xs">Tipo de cuenta</Label>
-                <Select
-                  value={form.account_type}
-                  onValueChange={(v) =>
-                    setForm({ ...form, account_type: v as "personal" | "negocio" })
-                  }
-                >
-                  <SelectTrigger className="mt-1.5 w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="personal">Personal</SelectItem>
-                    <SelectItem value="negocio">Pequeño negocio</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="mt-1.5 grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      ["personal", "Personal"],
+                      ["negocio", "Pequeño negocio"],
+                    ] as const
+                  ).map(([v, l]) => (
+                    <Button
+                      key={v}
+                      type="button"
+                      variant={form.account_type === v ? "default" : "outline"}
+                      onClick={() => setForm({ ...form, account_type: v })}
+                    >
+                      {l}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </section>
 
