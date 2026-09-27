@@ -18,6 +18,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { KpiCard } from "@/components/finance/kpi-card";
 import { EntryForm } from "@/components/finance/entry-form";
+import { ReceiptScanner } from "@/components/finance/receipt-scanner";
 import { EntriesTable } from "@/components/finance/entries-table";
 import { AccountsTable } from "@/components/finance/accounts-table";
 import { HealthPanel, RecommendationList } from "@/components/finance/health-panel";
@@ -185,6 +186,7 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="movimientos" className="mt-6 space-y-6">
+            <ReceiptScanner onAdd={addEntry} />
             <EntryForm onAdd={addEntry} />
             <EntriesTable entries={entries} onRemove={removeEntry} onUpdate={updateEntry} />
           </TabsContent>
