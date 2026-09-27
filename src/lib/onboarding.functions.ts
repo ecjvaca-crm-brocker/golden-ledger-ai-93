@@ -13,7 +13,11 @@ export const createRoadmap = createServerFn({ method: "POST" })
     const roadmap = await generateRoadmap(apiKey, data);
     const { error } = await context.supabase
       .from("onboarding")
-      .upsert({ user_id: context.userId, answers: data, roadmap: { ...roadmap, hechas: [] } });
+      .upsert({
+        user_id: context.userId,
+        answers: JSON.parse(JSON.stringify(data)),
+        roadmap: JSON.parse(JSON.stringify({ ...roadmap, hechas: [] })),
+      });
     if (error) throw new Error("No pudimos guardar tu hoja de ruta.");
     return roadmap;
   });
