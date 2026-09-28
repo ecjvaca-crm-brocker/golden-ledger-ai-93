@@ -139,7 +139,7 @@ function Index() {
         </section>
 
         <Tabs defaultValue="dashboard" className="mt-8">
-          <TabsList className="flex-wrap">
+          <TabsList className="h-auto flex-wrap justify-start gap-1">
             <TabsTrigger value="dashboard">
               <Activity className="mr-1.5 size-4" /> Dashboard
             </TabsTrigger>

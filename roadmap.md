@@ -7,6 +7,6 @@
 - [x] Bienvenida con cuestionario de situación inicial → balance inicial + hoja de ruta con microobjetivos semanales (IA)
 - [ ] WhatsApp automático: descartado por ahora (librería Python no puede correr en la app; requiere servidor propio o WhatsApp Business API)
 - [ ] Puntos por cada movimiento registrado
-- [ ] Móvil/tablet: corregir distorsión de botones en pantallas pequeñas
+- [x] Móvil/tablet: corregir distorsión de botones en pantallas pequeñas
 - [ ] Ocultar etiqueta flotante de Lovable (tapa el botón de WhatsApp)
 - [ ] Google Sheets: nuevo enlace AKfycbz-lIUdMpTGrlF598spngOh5DQlUMQZQnK-XCvSXmxwf3y94BqLvzSaVCxWYehFn8uV/exec — actualizar y probar
